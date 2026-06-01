@@ -8,23 +8,23 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        accent: "#f97316",
-        accent2: "#fb923c",
-        surface: "#0f172a",
-        surface2: "#1e293b",
-        "app-bg": "#030712",
-        "app-border": "#334155",
-        "app-text": "#f8fafc",
-        "app-muted": "#94a3b8",
-        "app-green": "#4ade80",
-        "app-yellow": "#facc15",
-        "app-red": "#f87171",
-        "app-blue": "#60a5fa",
-      },
       fontFamily: {
-        // Reference the CSS variable injected by next/font/google
         jakarta: ["var(--font-jakarta)", "Plus Jakarta Sans", "sans-serif"],
+      },
+      colors: {
+        accent:   "var(--accent)",
+        surface:  "var(--surface)",
+        surface2: "var(--surface2)",
+        surface3: "var(--surface3)",
+        border:   "var(--border)",
+        border2:  "var(--border2)",
+        "app-text":   "var(--text)",
+        "app-text2":  "var(--text2)",
+        "app-text3":  "var(--text3)",
+        "app-green":  "var(--green)",
+        "app-red":    "var(--red)",
+        "app-yellow": "var(--yellow)",
+        "app-blue":   "var(--blue)",
       },
     },
   },

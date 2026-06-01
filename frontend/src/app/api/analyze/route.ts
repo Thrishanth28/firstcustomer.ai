@@ -3,11 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 // Allow up to 60 seconds for Gemini to respond (Vercel hobby supports up to 60s)
 export const maxDuration = 60;
 
-// Primary model + fallback for resilience
+// Models ordered by quality — only ones confirmed working on this key
 const GEMINI_MODELS = [
-  "gemini-2.5-flash",
-  "gemini-2.0-flash",
-  "gemini-2.0-flash-001",
+  "gemini-2.5-flash",       // best quality
+  "gemini-2.5-flash-lite",  // fast & cheap
+  "gemini-flash-latest",    // auto-routed alias
+  "gemini-flash-lite-latest", // lightest fallback
 ];
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -302,18 +303,21 @@ export async function POST(req: NextRequest) {
   }
 
   if (!geminiRes) {
-    return NextResponse.json(
-      { detail: `All Gemini models unavailable. Last error: ${lastError}` },
-      { status: 502 }
-    );
+    // Check if the last error was a quota issue
+    const isQuota = lastError.includes("quota") || lastError.includes("429");
+    const msg = isQuota
+      ? "The AI service has reached its free-tier limit. Please wait a few minutes and try again, or check your Gemini API quota at aistudio.google.com."
+      : `AI service temporarily unavailable. Please try again in a moment. (${lastError.slice(0, 120)})`;
+    return NextResponse.json({ detail: msg }, { status: 503 });
   }
 
   if (!geminiRes.ok) {
     const errorText = await geminiRes.text();
-    return NextResponse.json(
-      { detail: `Gemini API returned ${geminiRes.status}: ${errorText.slice(0, 300)}` },
-      { status: 502 }
-    );
+    const isQuota = errorText.includes("quota") || geminiRes.status === 429;
+    const msg = isQuota
+      ? "AI quota exceeded. Please wait a few minutes and try again."
+      : `AI service error (${geminiRes.status}). Please try again shortly.`;
+    return NextResponse.json({ detail: msg }, { status: 503 });
   }
 
   const geminiBody = (await geminiRes.json()) as {

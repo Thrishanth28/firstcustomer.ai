@@ -81,7 +81,8 @@ interface WeekEntry {
 }
 
 /* ─── Constants ──────────────────────────────────────────────── */
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Uses Next.js internal API route — works on localhost AND Vercel production
+const API_URL = "/api";
 
 const STAGE_OPTIONS = [
   "Just an idea",

@@ -249,14 +249,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ detail: "Invalid JSON in request body." }, { status: 400 });
   }
 
-  // Validate all fields
+  // Bug fix #11: guard against non-string or missing fields before calling .trim()
   const required: (keyof StartupInput)[] = [
     "startup_name", "problem", "solution", "target_market", "pricing", "stage",
   ];
   for (const field of required) {
-    if (!body[field] || !body[field].trim()) {
+    const val = body[field];
+    if (typeof val !== "string" || !val.trim()) {
       return NextResponse.json(
-        { detail: `Field "${field}" must not be empty.` },
+        { detail: `Field "${field}" must be a non-empty string.` },
         { status: 422 }
       );
     }
